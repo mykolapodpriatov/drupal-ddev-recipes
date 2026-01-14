@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Drupal multisite hostname resolution.
+ *
+ * Copy this file to web/sites/sites.php (next to your default/ directory).
+ *
+ * The array key is the request hostname (with optional port and path),
+ * the value is the directory name under web/sites/ to use for that request.
+ *
+ * @see https://www.drupal.org/docs/multisite-drupal/multi-site-installation
+ */
+
+$sites = [
+  'site1.ddev.site'   => 'site1.ddev.site',
+  'site2.ddev.site'   => 'site2.ddev.site',
+
+  // If you ever access the project under a different port (e.g. 8443 from
+  // CI), DDEV strips that for you. But for raw multisite testing you may
+  // want explicit port-prefixed keys too:
+  // '8443.site1.ddev.site' => 'site1.ddev.site',
+];

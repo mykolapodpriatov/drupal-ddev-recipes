@@ -1,0 +1,8 @@
+# Per-site override loaded by DDEV after config.yaml.
+# Adds env vars specific to site1 so settings.php can route to the right DB.
+web_environment:
+  - DRUPAL_SITE_NAME=site1
+  - DRUPAL_DB_NAME=db_site1
+  - DRUPAL_DB_USER=db
+  - DRUPAL_DB_PASSWORD=db
+  - DRUPAL_DB_HOST=db

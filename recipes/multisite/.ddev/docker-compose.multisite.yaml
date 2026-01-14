@@ -1,0 +1,8 @@
+# Mounts an init SQL script into the DB container so the extra multisite
+# databases exist on first boot. MySQL/MariaDB only runs scripts in
+# /docker-entrypoint-initdb.d/ during the very first init of a data volume.
+# To re-trigger after edits: ddev delete -Oy && ddev start
+services:
+  db:
+    volumes:
+      - "./mysql/multisite-init.sql:/docker-entrypoint-initdb.d/multisite-init.sql:ro"

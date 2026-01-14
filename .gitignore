@@ -1,0 +1,45 @@
+# DDEV local-only artifacts (per-developer, not shared)
+.ddev/.homeadditions/
+.ddev/.global_commands/
+.ddev/.gitignore
+.ddev/db_snapshots/
+.ddev/import-db/
+.ddev/import.yaml
+.ddev/providers/
+.ddev/.dbimageBuild/
+.ddev/.dbimageExtra/
+.ddev/.webimageBuild/
+.ddev/.webimageExtra/
+.ddev/apache/.gitkeep
+.ddev/traefik/
+
+# Composer (consumer projects)
+vendor/
+composer.phar
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+
+# Drupal runtime
+sites/*/files/
+sites/*/private/
+sites/*/settings.local.php
+sites/default/settings.php
+
+# Xdebug profile output
+cachegrind.out.*
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Local env
+.env
+.env.local

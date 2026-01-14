@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+## Description: Install Drupal on every multisite host with its own DB.
+## Usage: multisite-install [--profile=standard]
+## Example: "ddev multisite-install" or "ddev multisite-install --profile=minimal"
+
+set -euo pipefail
+
+PROFILE="standard"
+for arg in "$@"; do
+  case "$arg" in
+    --profile=*) PROFILE="${arg#*=}" ;;
+    *) ;;
+  esac
+done
+
+SITES=("site1" "site2")
+
+for site in "${SITES[@]}"; do
+  db_name="db_${site}"
+  uri="https://${site}.ddev.site"
+
+  echo ""
+  echo "==> Installing Drupal on ${uri} (db=${db_name}, profile=${PROFILE})"
+
+  drush \
+    --root=/var/www/html/web \
+    --uri="${uri}" \
+    site:install "${PROFILE}" \
+    --db-url="mysql://db:db@db:3306/${db_name}" \
+    --site-name="${site}" \
+    --account-name=admin \
+    --account-pass=admin \
+    --yes
+done
+
+echo ""
+echo "All sites installed. Login URLs:"
+for site in "${SITES[@]}"; do
+  drush --root=/var/www/html/web --uri="https://${site}.ddev.site" user:login
+done

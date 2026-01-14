@@ -1,0 +1,28 @@
+name: drupal-multisite
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+# Multisite hostnames. mkcert provisions TLS for all of them.
+additional_hostnames:
+  - site1
+  - site2
+
+# Default URL still resolves to the project's primary site (default/).
+use_dns_when_possible: true
+
+# DDEV exposes per-site settings via web environment when these are set.
+web_environment:
+  - DRUPAL_MULTISITE=1
+
+omit_containers: []
