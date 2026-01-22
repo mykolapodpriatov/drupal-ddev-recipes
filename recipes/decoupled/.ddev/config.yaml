@@ -1,0 +1,28 @@
+name: drupal-decoupled
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+# Drupal lives on the project hostname; Next.js gets its own subdomain.
+# Comment these out and use the reverse-proxy nginx_full/nginx-site.conf
+# instead if you want a single hostname.
+additional_hostnames:
+  - api
+  - next
+
+# Forwarded so the Next.js container can reach Drupal at a stable URL.
+web_environment:
+  - DRUPAL_BASE_URL=https://api.drupal-decoupled.ddev.site
+  - NEXT_INTERNAL_DRUPAL_URL=http://web
+
+omit_containers: []

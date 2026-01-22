@@ -1,0 +1,39 @@
+# Adds a Next.js sidecar service to the DDEV project.
+# Mounts ./frontend (relative to the project root) and exposes port 3000
+# through the DDEV router so it's reachable at https://next.<project>.ddev.site.
+services:
+  nextjs:
+    container_name: ddev-${DDEV_SITENAME}-nextjs
+    image: node:20-alpine
+    working_dir: /app
+    restart: "no"
+    # Keep the container alive even when no dev server is running.
+    # `ddev next-dev` execs `npm run dev` into this container.
+    command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - "../frontend:/app:cached"
+      - "next_node_modules:/app/node_modules"
+    environment:
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTP_EXPOSE=3000:3000
+      - HTTPS_EXPOSE=3000:3000
+      - NEXT_PUBLIC_DRUPAL_BASE_URL=https://api.${DDEV_SITENAME}.ddev.site
+      - NEXT_INTERNAL_DRUPAL_URL=http://web
+      - NODE_ENV=development
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    expose:
+      - "3000"
+
+volumes:
+  next_node_modules:
+    name: "${DDEV_SITENAME}-next-node_modules"
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true

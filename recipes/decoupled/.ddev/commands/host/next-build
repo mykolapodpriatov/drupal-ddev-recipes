@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+## Description: Build the Next.js frontend for production.
+## Usage: next-build
+## Example: "ddev next-build"
+## ExecRaw: false
+
+set -euo pipefail
+
+docker exec -i "ddev-${DDEV_SITENAME}-nextjs" sh -c '
+  if [ ! -d /app/node_modules/next ]; then
+    npm install
+  fi
+  npm run build
+'

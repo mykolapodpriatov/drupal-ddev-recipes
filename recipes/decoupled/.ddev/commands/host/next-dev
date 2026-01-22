@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+## Description: Run "npm run dev" inside the Next.js sidecar.
+## Usage: next-dev
+## Example: "ddev next-dev"
+## ExecRaw: false
+
+set -euo pipefail
+
+# Install deps on first run.
+docker exec -i "ddev-${DDEV_SITENAME}-nextjs" sh -c '
+  if [ ! -d /app/node_modules/next ]; then
+    echo "==> Installing Next.js dependencies (first run, this can take a minute)..."
+    npm install
+  fi
+'
+
+echo "==> Starting Next.js dev server on https://next.${DDEV_SITENAME}.ddev.site:3000"
+exec docker exec -it "ddev-${DDEV_SITENAME}-nextjs" sh -c 'npm run dev -- --hostname 0.0.0.0 --port 3000'
