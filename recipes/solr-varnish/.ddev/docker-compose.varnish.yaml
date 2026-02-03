@@ -1,0 +1,46 @@
+# Varnish 7.5 in front of the DDEV web container.
+# Listens on 6081 (Varnish) and uses the bundled default.vcl.
+# `web` is the standard DDEV upstream service name.
+services:
+  varnish:
+    container_name: ddev-${DDEV_SITENAME}-varnish
+    image: varnish:7.5
+    restart: "no"
+    ports:
+      - "6081"
+    expose:
+      - "6081"
+    environment:
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTP_EXPOSE=6081:6081
+      - HTTPS_EXPOSE=6443:6081
+      - VARNISH_BACKEND_HOST=web
+      - VARNISH_BACKEND_PORT=80
+    volumes:
+      - "./varnish/default.vcl:/etc/varnish/default.vcl:ro"
+    command:
+      - varnishd
+      - "-F"
+      - "-f"
+      - "/etc/varnish/default.vcl"
+      - "-a"
+      - "0.0.0.0:6081"
+      - "-s"
+      - "malloc,256m"
+      - "-p"
+      - "http_resp_hdr_len=64k"
+      - "-p"
+      - "http_resp_size=128k"
+    depends_on:
+      - web
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true

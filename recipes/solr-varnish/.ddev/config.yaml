@@ -1,0 +1,23 @@
+name: drupal-solr-varnish
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+additional_hostnames:
+  - solr
+  - varnish
+
+web_environment:
+  - SEARCH_API_SOLR_HOST=solr
+  - SEARCH_API_SOLR_PORT=8983
+  - SEARCH_API_SOLR_CORE=drupal

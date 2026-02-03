@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+## Description: Clear + reindex search_api Solr indexes.
+## Usage: solr-reindex [--index=<machine_name>]
+## Example: "ddev solr-reindex" or "ddev solr-reindex --index=node"
+
+set -euo pipefail
+
+INDEX=""
+for arg in "$@"; do
+  case "$arg" in
+    --index=*) INDEX="${arg#*=}" ;;
+    *) ;;
+  esac
+done
+
+cd /var/www/html
+
+if [ -n "$INDEX" ]; then
+  echo "==> Clearing and reindexing search_api index: ${INDEX}"
+  drush search-api:clear "$INDEX"
+  drush search-api:index "$INDEX"
+else
+  echo "==> Clearing and reindexing all search_api indexes"
+  drush search-api:clear
+  drush search-api:index
+fi
+
+echo ""
+echo "==> Index status"
+drush search-api:status

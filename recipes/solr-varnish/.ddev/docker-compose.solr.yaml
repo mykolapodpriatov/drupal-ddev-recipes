@@ -1,0 +1,44 @@
+# Solr 9 service with a pre-mounted core named "drupal".
+# The mounted conf/ matches the search_api_solr 4.x config-set layout.
+services:
+  solr:
+    container_name: ddev-${DDEV_SITENAME}-solr
+    image: solr:9
+    restart: "no"
+    ports:
+      - "8983"
+    expose:
+      - "8983"
+    environment:
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTP_EXPOSE=8983:8983
+      - HTTPS_EXPOSE=8943:8983
+      - SOLR_HEAP=512m
+    volumes:
+      - "solr_data:/var/solr"
+      - "./solr/cores/drupal/conf:/opt/solr/server/solr/configsets/drupal/conf:ro"
+    # Create the "drupal" core on first start if it doesn't already exist.
+    command:
+      - solr-precreate
+      - drupal
+      - /opt/solr/server/solr/configsets/drupal
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/drupal/admin/ping?wt=json | grep -q '\"status\":\"OK\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  solr_data:
+    name: "${DDEV_SITENAME}-solr-data"
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true

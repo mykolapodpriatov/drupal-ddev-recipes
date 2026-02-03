@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   extra MySQL databases, drush install helper).
 - Decoupled recipe — Drupal 11 + Next.js 14 sidecar service, optional
   single-hostname reverse-proxy nginx config, host commands for dev/build.
+- Solr + Varnish recipe — Solr 9 sidecar with auto-created `drupal` core,
+  Varnish 7.5 with tag-based BAN purges, drush reindex helper.
 
 ## [0.1.0] - 2026-01-14
 
