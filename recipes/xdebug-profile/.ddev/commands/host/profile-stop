@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+## Description: Disable Xdebug profile mode and restart the web container.
+## Usage: profile-stop
+## Example: "ddev profile-stop"
+## ExecRaw: false
+
+set -euo pipefail
+
+PHP_DIR="${DDEV_APPROOT}/.ddev/php"
+INI_ACTIVE="${PHP_DIR}/xdebug-profile.ini"
+INI_DISABLED="${PHP_DIR}/xdebug-profile.ini.disabled"
+
+if [ -f "$INI_ACTIVE" ]; then
+  mv "$INI_ACTIVE" "$INI_DISABLED"
+fi
+
+echo "==> Xdebug profile mode disabled. Restarting web container..."
+ddev restart
+
+echo ""
+echo "Profile mode is OFF. Existing profiles are still in .ddev/cachegrind/."

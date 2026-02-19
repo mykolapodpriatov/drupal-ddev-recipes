@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+## Description: Switch Xdebug to profile mode and restart the web container.
+## Usage: profile-start
+## Example: "ddev profile-start"
+## ExecRaw: false
+
+set -euo pipefail
+
+PHP_DIR="${DDEV_APPROOT}/.ddev/php"
+INI_DISABLED="${PHP_DIR}/xdebug-profile.ini.disabled"
+INI_ACTIVE="${PHP_DIR}/xdebug-profile.ini"
+
+# Make sure the cachegrind output directory exists on the host.
+mkdir -p "${DDEV_APPROOT}/.ddev/cachegrind"
+
+if [ -f "$INI_DISABLED" ]; then
+  mv "$INI_DISABLED" "$INI_ACTIVE"
+fi
+
+if [ ! -f "$INI_ACTIVE" ]; then
+  echo "ERROR: ${INI_ACTIVE} not found. Did you copy .ddev/php/ from the recipe?" >&2
+  exit 1
+fi
+
+echo "==> Xdebug profile mode enabled. Restarting web container..."
+ddev restart
+
+cat <<EOF
+
+Profile mode is now active.
+
+To capture a profile, send a request with the trigger:
+
+  curl -H 'XDEBUG_TRIGGER: 1' https://${DDEV_HOSTNAME}/some/path
+
+Or use the "Xdebug helper" browser extension and switch it to "Profile".
+
+Profiles appear in: ${DDEV_APPROOT}/.ddev/cachegrind/
+
+Open the latest with:  ddev profile-open
+Stop profile mode:     ddev profile-stop
+EOF

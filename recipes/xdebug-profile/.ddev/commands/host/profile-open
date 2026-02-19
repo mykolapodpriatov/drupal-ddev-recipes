@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+## Description: Open the most recent cachegrind file with qcachegrind / kcachegrind.
+## Usage: profile-open
+## Example: "ddev profile-open"
+## ExecRaw: false
+
+set -euo pipefail
+
+CACHEGRIND_DIR="${DDEV_APPROOT}/.ddev/cachegrind"
+
+if [ ! -d "$CACHEGRIND_DIR" ]; then
+  echo "No profiles yet — run 'ddev profile-start' and trigger a request first." >&2
+  exit 1
+fi
+
+LATEST="$(ls -t "$CACHEGRIND_DIR"/cachegrind.out.* 2>/dev/null | head -n 1 || true)"
+
+if [ -z "$LATEST" ]; then
+  echo "No cachegrind files in ${CACHEGRIND_DIR}." >&2
+  echo "Did you send a request with the XDEBUG_TRIGGER header / cookie?" >&2
+  exit 1
+fi
+
+echo "==> Opening ${LATEST}"
+
+# Find an installed viewer in this order: qcachegrind, kcachegrind, webgrind.
+if command -v qcachegrind >/dev/null 2>&1; then
+  exec qcachegrind "$LATEST"
+elif command -v kcachegrind >/dev/null 2>&1; then
+  exec kcachegrind "$LATEST"
+elif [ "$(uname)" = "Darwin" ] && [ -d "/Applications/qcachegrind.app" ]; then
+  exec open -a qcachegrind "$LATEST"
+else
+  cat >&2 <<EOF
+No cachegrind viewer found on PATH.
+
+Install one of:
+  macOS:   brew install qcachegrind
+  Linux:   sudo apt-get install kcachegrind
+
+Or open this file manually:
+  ${LATEST}
+EOF
+  exit 1
+fi

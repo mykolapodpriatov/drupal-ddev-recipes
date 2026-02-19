@@ -1,0 +1,26 @@
+name: drupal-xdebug-profile
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+# Note: xdebug_enabled is intentionally false. The xdebug-profile.ini below
+# loads the Xdebug extension via PHP config when profile-start is invoked.
+# DDEV's built-in xdebug_enabled=true forces *debug* mode, which is not what
+# we want here.
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+# Mount the host-side cachegrind directory so profiles are visible without
+# `ddev exec` gymnastics.
+web_environment:
+  - PHP_IDE_CONFIG=serverName=ddev
+
+# Files in .ddev/php/ are appended to the web container PHP config; we
+# activate one of them via the profile-start / profile-stop host commands.
