@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Varnish 7.5 with tag-based BAN purges, drush reindex helper.
 - Xdebug profile-mode recipe — request-trigger gated, host commands to
   start/stop/open profiles in qcachegrind/kcachegrind.
+- Mailpit recipe — PHP sendmail override + Symfony Mailer SMTP transport
+  config pointed at DDEV's built-in mailpit service.
 
 ## [0.1.0] - 2026-01-14
 

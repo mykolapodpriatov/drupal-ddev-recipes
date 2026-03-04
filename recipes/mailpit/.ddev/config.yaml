@@ -1,0 +1,24 @@
+name: drupal-mailpit
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+# DDEV ^1.22 starts the mailpit container automatically; nothing to add.
+
+web_environment:
+  # Symfony Mailer reads MAILER_DSN if you set up the transport via env.
+  # The bundled config/sync/symfony_mailer.mailer_transport.smtp.yml is
+  # the recommended approach (config-managed transport), but the env var
+  # is handy for ad-hoc overrides.
+  - MAILER_DSN=smtp://mailpit:1025
+  - DRUPAL_SITE_MAIL=noreply@example.com

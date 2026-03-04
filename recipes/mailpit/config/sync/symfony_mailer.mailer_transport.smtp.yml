@@ -1,0 +1,15 @@
+uuid: c1f4a0a4-9b7d-4f3a-9f6e-1e3d9b2a6b4c
+langcode: en
+status: true
+dependencies: {  }
+id: smtp
+label: 'Mailpit (DDEV)'
+plugin: smtp
+configuration:
+  user: ''
+  pass: ''
+  host: mailpit
+  port: 1025
+  query:
+    verify_peer: false
+    local_domain: ddev.site
