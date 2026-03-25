@@ -1,0 +1,35 @@
+# Redis 7 (alpine) sidecar for Drupal cache + queue + lock + flood.
+# 128MB cap, LRU eviction — small enough not to bother local Docker.
+services:
+  redis:
+    container_name: ddev-${DDEV_SITENAME}-redis
+    image: redis:7-alpine
+    restart: "no"
+    expose:
+      - "6379"
+    command:
+      - redis-server
+      - --maxmemory
+      - "128mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true

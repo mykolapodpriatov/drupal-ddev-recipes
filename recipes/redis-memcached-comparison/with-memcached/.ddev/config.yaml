@@ -1,0 +1,19 @@
+name: drupal-cache-memcached
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+web_environment:
+  - CACHE_BACKEND=memcached
+  - MEMCACHED_HOST=memcached
+  - MEMCACHED_PORT=11211

@@ -1,0 +1,31 @@
+# Memcached 1.6 (alpine) sidecar for Drupal cache backend.
+# 128MB cap matches the Redis variant so benchmarks are apples-to-apples.
+services:
+  memcached:
+    container_name: ddev-${DDEV_SITENAME}-memcached
+    image: memcached:1.6-alpine
+    restart: "no"
+    expose:
+      - "11211"
+    command:
+      - memcached
+      - -m
+      - "128"
+      - -I
+      - "2m"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    healthcheck:
+      test: ["CMD-SHELL", "echo stats | nc -w 1 127.0.0.1 11211 | grep -q uptime"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true
