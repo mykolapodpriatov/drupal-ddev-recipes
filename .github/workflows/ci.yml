@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint YAML + shell + structure
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install yamllint
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run validate-recipes.sh
+        run: ./scripts/validate-recipes.sh
+
+  ddev-config:
+    name: DDEV accepts each recipe
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install DDEV
+        run: |
+          curl -fsSL https://ddev.com/install.sh | bash
+          ddev version
+
+      - name: Validate every recipe with `ddev config`
+        run: |
+          set -euo pipefail
+          for cfg in $(find recipes -type f -path '*/.ddev/config.yaml'); do
+            recipe_dir="$(dirname "$(dirname "$cfg")")"
+            echo "==> Validating $recipe_dir"
+
+            # ddev config --auto-confirm parses and rewrites the config; if it
+            # accepts the file, the recipe is at least structurally valid.
+            ( cd "$recipe_dir" && ddev config --auto-confirm >/dev/null )
+          done

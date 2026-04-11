@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   config pointed at DDEV's built-in mailpit service.
 - Redis vs Memcached comparison recipe — parallel `.ddev/` configs for
   drupal/redis and drupal/memcache with matched 128 MB caps for fair A/B.
+- `scripts/validate-recipes.sh` — yamllint + structural + shellcheck pass
+  for the whole `recipes/` tree.
+- GitHub Actions `ci.yml` — runs the validate script and also re-parses
+  every `.ddev/config.yaml` through `ddev config --auto-confirm` in a job.
 
 ## [0.1.0] - 2026-01-14
 
