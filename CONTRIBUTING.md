@@ -12,7 +12,9 @@ a tutorial. Please keep that bar in mind when proposing changes.
 - Every recipe lives under `recipes/<recipe-name>/` and ships its own
   `README.md` plus a working `.ddev/` directory.
 - A recipe must boot with a clean `ddev start` from an empty Drupal project
-  after the `.ddev/` directory is copied in — no manual editing required.
+  after the `.ddev/` directory is copied in. Keep manual steps to a minimum;
+  where a recipe genuinely needs project-specific values (e.g. the decoupled
+  recipe's frontend hostname), document them clearly in that recipe's README.
 - Keep configuration files commented. The audience is a developer learning
   *why*, not just *what*.
 
