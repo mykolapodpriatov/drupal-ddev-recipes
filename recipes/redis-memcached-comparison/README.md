@@ -63,6 +63,9 @@ if (extension_loaded('redis') && getenv('IS_DDEV_PROJECT')) {
   $settings['cache_prefix']                    = 'drupal_' . getenv('DDEV_SITENAME');
 
   // Use chained-fast to keep an APCu layer in front of Redis on hot keys.
+  // chainedfast is a wrapper: it serves from APCu, then falls back to the
+  // configured `cache']['default']` backend (Redis here), so naming Redis on
+  // each bin is unnecessary — these lines are complete as written.
   $settings['cache']['bins']['bootstrap']      = 'cache.backend.chainedfast';
   $settings['cache']['bins']['config']         = 'cache.backend.chainedfast';
   $settings['cache']['bins']['discovery']      = 'cache.backend.chainedfast';

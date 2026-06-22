@@ -52,9 +52,9 @@ curl -H 'XDEBUG_TRIGGER: 1' https://<project>.ddev.site/some/slow/page
 #   "Xdebug helper" / "Xdebug Profiler" Chrome/Firefox extension.
 ```
 
-Profile files appear in `/tmp/cachegrind/` inside the web container. They're
-also mounted to the host at `./.ddev/cachegrind/` so you can open them
-directly.
+Profile files appear in `/mnt/ddev_config/cachegrind` inside the web container,
+which is the host's `./.ddev/cachegrind/` directory — so you can open them
+directly without copying anything out of the container.
 
 ```bash
 ddev profile-open     # opens the latest cachegrind file with qcachegrind
