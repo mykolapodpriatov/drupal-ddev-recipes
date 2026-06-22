@@ -1,8 +1,11 @@
 ; Xdebug 3 in profile mode (NOT debug mode).
 ;
-; Loaded automatically by DDEV from /etc/php/8.3/fpm/conf.d/ when this file
-; is named like *.ini and present in .ddev/php/. The profile-start /
-; profile-stop host commands rename this file to enable/disable it.
+; DDEV auto-loads every .ddev/php/*.ini into the web container, so this file
+; SHIPS DISABLED (named *.ini.disabled) on purpose — profile mode adds heavy
+; per-request overhead (~3-10x) and must be opt-in, never on at plain
+; `ddev start`. The profile-start / profile-stop host commands rename it
+; between *.ini.disabled (inert) and *.ini (active) and restart the web
+; container. Do not rename it by hand unless you know what you're doing.
 
 zend_extension=xdebug
 
