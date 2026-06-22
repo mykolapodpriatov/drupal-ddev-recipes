@@ -64,6 +64,25 @@ cors.config:
   supportsCredentials: true
 ```
 
+## Configure the frontend env (required)
+
+Unlike the other recipes in this repo, the decoupled recipe is **not** a pure
+drop-in: the Next.js frontend needs to know your Drupal hostname, and that
+depends on your DDEV project name. Copy `frontend/.env.example` to
+`frontend/.env` and set `NEXT_PUBLIC_DRUPAL_BASE_URL` to your real Drupal URL:
+
+```bash
+cp frontend/.env.example frontend/.env
+# Edit it, or derive the value from DDEV at copy time:
+sed -i '' "s#https://api.drupal-decoupled.ddev.site#https://api.$(ddev describe -j | jq -r .raw.name).ddev.site#" frontend/.env
+```
+
+The defaults baked into `frontend/.env.example` and `frontend/next.config.js`
+assume a project named `drupal-decoupled`; they only work as-is if your DDEV
+project happens to have that name. For any other project name you **must**
+update `NEXT_PUBLIC_DRUPAL_BASE_URL` to `https://api.<your-project>.ddev.site`
+(or set it to whatever hostname serves Drupal in your setup).
+
 ## Preview mode
 
 The official integration is [`next` module + `next-drupal`](https://next-drupal.org/).
@@ -78,4 +97,7 @@ at the Drupal API.
 |-------------------|-------------------------------------------------------|
 | `ddev next-dev`   | Starts Next.js dev server on port 3000.              |
 | `ddev next-build` | Production build inside the `nextjs` container.       |
-| `ddev next-start` | (optional) Run the production build.                 |
+
+To serve the production build, run `ddev next-build` and then start it inside
+the container with `docker exec -it ddev-${DDEV_SITENAME}-nextjs npm run start`
+(the `start` script is in `frontend/package.json`).
