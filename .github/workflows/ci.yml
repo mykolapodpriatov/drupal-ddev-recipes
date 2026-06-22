@@ -38,14 +38,27 @@ jobs:
           curl -fsSL https://ddev.com/install.sh | bash
           ddev version
 
-      - name: Validate every recipe with `ddev config`
+      - name: Install yamllint
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install yamllint
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Validate every recipe config against the DDEV schema
         run: |
           set -euo pipefail
+          # `ddev config` (the only thing that could "accept" a recipe) requires
+          # a running Docker provider for every sub-command — it is unavailable
+          # in this job and the previous `--auto-confirm` flag does not exist in
+          # current DDEV, so the step never validated anything and exited 255.
+          #
+          # Instead, validate each recipe with the repo's own Docker-free
+          # validator: it lints every YAML file, asserts each recipe ships a
+          # `.ddev/config.yaml` with a valid `name:` and a Drupal `type:`
+          # (i.e. a config DDEV will accept), and shellchecks bundled commands.
           for cfg in $(find recipes -type f -path '*/.ddev/config.yaml'); do
-            recipe_dir="$(dirname "$(dirname "$cfg")")"
-            echo "==> Validating $recipe_dir"
-
-            # ddev config --auto-confirm parses and rewrites the config; if it
-            # accepts the file, the recipe is at least structurally valid.
-            ( cd "$recipe_dir" && ddev config --auto-confirm >/dev/null )
+            echo "==> Found recipe config: ${cfg}"
           done
+          ./scripts/validate-recipes.sh
