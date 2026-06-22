@@ -1,5 +1,7 @@
 # Drupal DDEV Recipes
 
+[![CI](https://github.com/mykolapodpriatov/drupal-ddev-recipes/actions/workflows/ci.yml/badge.svg)](https://github.com/mykolapodpriatov/drupal-ddev-recipes/actions/workflows/ci.yml)
+
 A curated collection of [DDEV](https://ddev.com/) recipes for the Drupal
 scenarios that actually come up in client work: multisite, decoupled,
 Solr + Varnish, Xdebug profiling, mail testing, and Redis vs Memcached.
