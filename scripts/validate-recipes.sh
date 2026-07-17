@@ -32,12 +32,10 @@ FAIL=0
 # ----- 1. yamllint --------------------------------------------------------
 if command -v yamllint >/dev/null 2>&1; then
   echo "==> Running yamllint on YAML files under recipes/"
-  # Relaxed rules: line-length is the only one we actually care about here.
-  # Relaxed: Drupal config-export YAML uses `dependencies: {  }` and other
-  # patterns that yamllint defaults grumble about — those are not bugs.
-  if ! yamllint \
-      -d '{extends: default, rules: {line-length: {max: 200}, document-start: disable, truthy: {check-keys: false}, braces: {min-spaces-inside: 0, max-spaces-inside: 2}, empty-values: disable}}' \
-      "$RECIPES_DIR"; then
+  # Rules live in .yamllint.yml at the repo root (relaxed for Drupal/DDEV
+  # config-export YAML — see that file for the rationale). CI reads the same
+  # file, so local and CI lint stay in lockstep.
+  if ! yamllint -c "${REPO_ROOT}/.yamllint.yml" "$RECIPES_DIR"; then
     red "yamllint reported issues."
     FAIL=1
   else
@@ -72,11 +70,11 @@ for recipe_dir in "$RECIPES_DIR"/*/; do
 
   while IFS= read -r cfg; do
     if ! grep -qE '^name:' "$cfg"; then
-      red "  [${recipe_name}] ${cfg#$REPO_ROOT/} missing 'name:'"
+      red "  [${recipe_name}] ${cfg#"$REPO_ROOT"/} missing 'name:'"
       FAIL=1
     fi
     if ! grep -qE '^type:[[:space:]]*drupal(1[01]|10|11)' "$cfg"; then
-      red "  [${recipe_name}] ${cfg#$REPO_ROOT/} 'type:' is not a Drupal type"
+      red "  [${recipe_name}] ${cfg#"$REPO_ROOT"/} 'type:' is not a Drupal type"
       FAIL=1
     fi
   done <<<"$ddev_configs"
@@ -89,7 +87,7 @@ if command -v shellcheck >/dev/null 2>&1; then
   echo "==> Running shellcheck on .ddev/commands/**/*"
   while IFS= read -r script; do
     if ! shellcheck -S warning -e SC1091,SC2034,SC2012 "$script"; then
-      red "shellcheck failed on ${script#$REPO_ROOT/}"
+      red "shellcheck failed on ${script#"$REPO_ROOT"/}"
       FAIL=1
     fi
   done < <(find "$RECIPES_DIR" -type f -path '*/.ddev/commands/*' -not -name '*.md')
