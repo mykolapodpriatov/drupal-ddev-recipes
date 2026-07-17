@@ -1,0 +1,23 @@
+name: drupal-postgres
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: postgres
+  version: "16"
+nodejs_version: "20"
+
+# DDEV spins up a `db` container running PostgreSQL 16 instead of MariaDB.
+# `ddev describe` shows the connection details; from the web container the
+# host is `db`, port 5432, and the database/user/password are all `db`.
+
+web_environment:
+  # Optional: expose a libpq-style DSN for tooling that reads it. Drupal
+  # itself is wired via settings.php (see this recipe's README), not this.
+  - DATABASE_URL=pgsql://db:db@db:5432/db
