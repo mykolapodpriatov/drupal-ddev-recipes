@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for FunctionalJavascript and Nightwatch tests, plus a `run-functional`
   command that exports `MINK_DRIVER_ARGS_WEBDRIVER` and runs the browser
   testsuite, with a live noVNC view on 7900.
+- `scripts/new-recipe.sh <name>` — scaffolds a `validate-recipes.sh`-clean
+  recipe skeleton (`.ddev/config.yaml` with `name:` + Drupal `type:` and a
+  `README.md` stub), validates the name and refuses to overwrite an existing
+  recipe. Documented in `CONTRIBUTING.md`.
 
 ## [0.2.0] - 2026-06-22
 
