@@ -27,38 +27,31 @@ jobs:
       - name: Run validate-recipes.sh
         run: ./scripts/validate-recipes.sh
 
-  ddev-config:
-    name: DDEV accepts each recipe
+  readme-coverage:
+    name: Every recipe is documented in the README
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install DDEV
-        run: |
-          curl -fsSL https://ddev.com/install.sh | bash
-          ddev version
-
-      - name: Install yamllint
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install yamllint
-
-      - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
-
-      - name: Validate every recipe config against the DDEV schema
+      - name: Assert each recipes/* dir is listed in the root README table
         run: |
           set -euo pipefail
-          # `ddev config` (the only thing that could "accept" a recipe) requires
-          # a running Docker provider for every sub-command — it is unavailable
-          # in this job and the previous `--auto-confirm` flag does not exist in
-          # current DDEV, so the step never validated anything and exited 255.
-          #
-          # Instead, validate each recipe with the repo's own Docker-free
-          # validator: it lints every YAML file, asserts each recipe ships a
-          # `.ddev/config.yaml` with a valid `name:` and a Drupal `type:`
-          # (i.e. a config DDEV will accept), and shellchecks bundled commands.
-          for cfg in $(find recipes -type f -path '*/.ddev/config.yaml'); do
-            echo "==> Found recipe config: ${cfg}"
+          # The old `ddev-config` job here just re-ran validate-recipes.sh (which
+          # the `lint` job already runs) because `ddev config` needs a Docker
+          # provider that isn't available in CI. Replace it with a check that
+          # actually adds value: every recipe directory must appear in the
+          # root README recipe table, so a new recipe can't ship undocumented.
+          missing=0
+          for recipe_dir in recipes/*/; do
+            name="$(basename "$recipe_dir")"
+            if ! grep -q "recipes/${name}/" README.md; then
+              echo "::error::recipe '${name}' is not linked in README.md"
+              missing=1
+            else
+              echo "==> ${name} is documented"
+            fi
           done
-          ./scripts/validate-recipes.sh
+          if [ "$missing" -ne 0 ]; then
+            echo "Add the missing recipe(s) to the README recipe table."
+            exit 1
+          fi

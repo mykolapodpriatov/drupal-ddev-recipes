@@ -28,6 +28,7 @@ copy it into your project, run `ddev restart`, you're done.
 | [`xdebug-profile`](recipes/xdebug-profile/) | Xdebug in **profile** mode (not debug) for cachegrind analysis. |
 | [`mailpit`](recipes/mailpit/) | DDEV's built-in Mailpit wired to `symfony_mailer` for transactional email testing. |
 | [`redis-memcached-comparison`](recipes/redis-memcached-comparison/) | Side-by-side Redis and Memcached setups with Drupal `settings.php` snippets. |
+| [`postgres`](recipes/postgres/) | Drupal 11 on PostgreSQL 16 with the `pgsql` driver `settings.php` snippet and `import-db` notes. |
 
 ## How to use a recipe
 

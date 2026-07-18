@@ -32,7 +32,10 @@ a tutorial. Please keep that bar in mind when proposing changes.
 
 ## Style
 
-- YAML: 2-space indent, no trailing whitespace. We run `yamllint` in CI.
+- YAML: 2-space indent, no trailing whitespace. We run `yamllint` in CI and
+  locally via `scripts/validate-recipes.sh`; both read the shared rule set in
+  [`.yamllint.yml`](.yamllint.yml) at the repo root (relaxed for Drupal/DDEV
+  config-export patterns). Tweak lint behaviour there, not inline in the script.
 - Shell: `#!/usr/bin/env bash`, `set -euo pipefail`, shellcheck-clean.
 - VCL / nginx confs: comment every non-obvious block.
 

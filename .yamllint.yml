@@ -1,0 +1,23 @@
+# yamllint config for drupal-ddev-recipes.
+#
+# These are deliberately relaxed relative to yamllint's defaults: Drupal
+# config-export YAML and DDEV configs use patterns (long lines, `{  }` empty
+# maps, unquoted on/off-style keys, empty values) that are idiomatic here and
+# not bugs. validate-recipes.sh and CI both point yamllint at this file.
+extends: default
+
+rules:
+  # DDEV configs and VCL-adjacent YAML routinely run past 80 cols.
+  line-length:
+    max: 200
+  # Recipe fragments are not standalone documents; no leading `---` required.
+  document-start: disable
+  # Drupal/DDEV use on/off/yes/no-style keys; don't flag them as booleans.
+  truthy:
+    check-keys: false
+  # Drupal config export writes `dependencies: {  }` etc.
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 2
+  # Empty values (e.g. `key:`) are common and intentional in these configs.
+  empty-values: disable

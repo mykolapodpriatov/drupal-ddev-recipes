@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- PostgreSQL recipe — Drupal 11 on PostgreSQL 16 via DDEV's native
+  `database.type: postgres`, with a `pgsql`-driver `settings.php` snippet and
+  notes on how `ddev import-db` differs from MySQL (plain `pg_dump` only, no
+  MySQL dumps, no custom/directory formats).
+
 ## [0.2.0] - 2026-06-22
 
 ### Added
