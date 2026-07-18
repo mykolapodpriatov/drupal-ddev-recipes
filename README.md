@@ -30,6 +30,7 @@ copy it into your project, run `ddev restart`, you're done.
 | [`redis-memcached-comparison`](recipes/redis-memcached-comparison/) | Side-by-side Redis and Memcached setups with Drupal `settings.php` snippets. |
 | [`postgres`](recipes/postgres/) | Drupal 11 on PostgreSQL 16 with the `pgsql` driver `settings.php` snippet and `import-db` notes. |
 | [`opensearch`](recipes/opensearch/) | Single-node OpenSearch 2.x (Apache-2.0 Elasticsearch-compatible) as a Search API backend, security plugin off for local dev. |
+| [`browser-testing`](recipes/browser-testing/) | Headless Chromium via a Selenium sidecar for Drupal FunctionalJavascript / Nightwatch tests, with a `run-functional` command. |
 
 ## How to use a recipe
 
