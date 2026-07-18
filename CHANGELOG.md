@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `database.type: postgres`, with a `pgsql`-driver `settings.php` snippet and
   notes on how `ddev import-db` differs from MySQL (plain `pg_dump` only, no
   MySQL dumps, no custom/directory formats).
+- OpenSearch recipe — single-node OpenSearch 2.x sidecar (the Apache-2.0
+  Elasticsearch fork) wired for Search API, security plugin disabled for local
+  dev, with the `search_api_opensearch` Composer note and server settings.
 
 ## [0.2.0] - 2026-06-22
 

@@ -29,6 +29,7 @@ copy it into your project, run `ddev restart`, you're done.
 | [`mailpit`](recipes/mailpit/) | DDEV's built-in Mailpit wired to `symfony_mailer` for transactional email testing. |
 | [`redis-memcached-comparison`](recipes/redis-memcached-comparison/) | Side-by-side Redis and Memcached setups with Drupal `settings.php` snippets. |
 | [`postgres`](recipes/postgres/) | Drupal 11 on PostgreSQL 16 with the `pgsql` driver `settings.php` snippet and `import-db` notes. |
+| [`opensearch`](recipes/opensearch/) | Single-node OpenSearch 2.x (Apache-2.0 Elasticsearch-compatible) as a Search API backend, security plugin off for local dev. |
 
 ## How to use a recipe
 

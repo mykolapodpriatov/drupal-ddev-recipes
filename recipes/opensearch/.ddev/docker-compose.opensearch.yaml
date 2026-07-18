@@ -1,0 +1,54 @@
+# Single-node OpenSearch 2.x service for Search API.
+#
+# The security plugin is disabled (DISABLE_SECURITY_PLUGIN=true) so the node
+# is plain HTTP on 9200 with no auth/TLS — correct for local dev, NEVER for
+# production. From the web container it is reachable at http://opensearch:9200.
+services:
+  opensearch:
+    container_name: ddev-${DDEV_SITENAME}-opensearch
+    image: opensearchproject/opensearch:2
+    restart: "no"
+    expose:
+      - "9200"
+    environment:
+      # Single-node cluster — no peer discovery, no bootstrap checks.
+      - discovery.type=single-node
+      # Disable the security plugin and its demo config for local dev.
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      # Lock the heap into RAM (needs the memlock ulimit below).
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      # Let DDEV's router expose the node on the project hostname too.
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTP_EXPOSE=9200:9200
+      - HTTPS_EXPOSE=9243:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - "opensearch_data:/usr/share/opensearch/data"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  opensearch_data:
+    name: "${DDEV_SITENAME}-opensearch-data"
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true
