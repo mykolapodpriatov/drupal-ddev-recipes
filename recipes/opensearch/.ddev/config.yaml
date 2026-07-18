@@ -1,0 +1,24 @@
+name: drupal-opensearch
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+additional_hostnames:
+  - opensearch
+
+web_environment:
+  # Reachable from the web container as http://opensearch:9200. The security
+  # plugin is disabled in docker-compose.opensearch.yaml for local dev, so
+  # this is plain HTTP with no auth and no TLS.
+  - OPENSEARCH_HOST=opensearch
+  - OPENSEARCH_PORT=9200

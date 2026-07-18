@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+## Description: Run Drupal browser (WebDriver) tests against the chrome sidecar.
+## Usage: run-functional [--testsuite=<name>] [extra phpunit args...]
+## Example: "ddev run-functional" or "ddev run-functional --testsuite=functional web/core/modules/system"
+
+set -euo pipefail
+
+# WebDriver endpoint of the selenium/standalone-chromium sidecar (service
+# "chrome", reachable across the DDEV network on port 4444). Drupal's
+# FunctionalJavascript tests parse this JSON array as
+# [driver, desiredCapabilities, wdHost]. Headless + no-sandbox so it runs in
+# the container without an X server.
+export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-gpu","--headless","--no-sandbox","--window-size=1920,1080"]}}, "http://chrome:4444/wd/hub"]'
+
+# Default to the browser-driven testsuite (the whole point of this recipe);
+# override with --testsuite=functional / kernel / unit to reuse the runner.
+TESTSUITE="functional-javascript"
+ARGS=()
+for arg in "$@"; do
+  case "$arg" in
+    --testsuite=*) TESTSUITE="${arg#*=}" ;;
+    *) ARGS+=("$arg") ;;
+  esac
+done
+
+cd /var/www/html
+
+# BrowserTestBase writes failure HTML/screenshots here; make sure it exists.
+mkdir -p web/sites/simpletest/browser_output
+
+echo "==> phpunit --testsuite ${TESTSUITE} (browser: http://chrome:4444/wd/hub)"
+php ./vendor/bin/phpunit \
+  -c web/core/phpunit.xml.dist \
+  --testsuite "${TESTSUITE}" \
+  ${ARGS[@]+"${ARGS[@]}"}

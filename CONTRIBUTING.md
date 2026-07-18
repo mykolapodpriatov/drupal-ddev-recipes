@@ -22,7 +22,15 @@ a tutorial. Please keep that bar in mind when proposing changes.
 
 1. Open an issue describing the use-case the recipe solves and the moving
    parts (extra services, host commands, settings.php snippets).
-2. Create `recipes/<your-recipe>/` with at minimum:
+2. Scaffold the skeleton with the helper — it writes a valid
+   `.ddev/config.yaml` (with `name:` + Drupal `type:`) and a `README.md` stub,
+   and refuses to overwrite an existing recipe:
+
+   ```bash
+   scripts/new-recipe.sh <your-recipe>
+   ```
+
+   Then flesh it out. At minimum a recipe ships:
    - `README.md` — purpose, when to use, when **not** to use, install steps.
    - `.ddev/config.yaml` — base DDEV config.
    - Any `docker-compose.*.yaml`, `commands/`, `php/`, `nginx_full/` overrides.

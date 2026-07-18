@@ -1,0 +1,29 @@
+name: drupal-browser-testing
+type: drupal11
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+performance_mode: mutagen
+composer_version: "2"
+database:
+  type: mariadb
+  version: "10.11"
+nodejs_version: "20"
+
+additional_hostnames:
+  - chrome
+
+web_environment:
+  # Drupal's PHPUnit runner reads these. SIMPLETEST_BASE_URL must be a hostname
+  # the *browser* (running inside the chrome container) can reach — that is the
+  # web container's service name "web" on the shared DDEV network, not
+  # localhost. Nightwatch reads DRUPAL_TEST_* mirrors of the same values.
+  - SIMPLETEST_BASE_URL=http://web
+  - SIMPLETEST_DB=mysql://db:db@db:3306/db
+  - BROWSERTEST_OUTPUT_DIRECTORY=/var/www/html/web/sites/simpletest/browser_output
+  - DRUPAL_TEST_BASE_URL=http://web
+  - DRUPAL_TEST_WEBDRIVER_HOSTNAME=chrome
+  - DRUPAL_TEST_WEBDRIVER_PORT=4444

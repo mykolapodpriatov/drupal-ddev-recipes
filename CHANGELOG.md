@@ -12,6 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `database.type: postgres`, with a `pgsql`-driver `settings.php` snippet and
   notes on how `ddev import-db` differs from MySQL (plain `pg_dump` only, no
   MySQL dumps, no custom/directory formats).
+- OpenSearch recipe — single-node OpenSearch 2.x sidecar (the Apache-2.0
+  Elasticsearch fork) wired for Search API, security plugin disabled for local
+  dev, with the `search_api_opensearch` Composer note and server settings.
+- Browser/E2E testing recipe — a `selenium/standalone-chromium` sidecar
+  (multi-arch, runs on Apple Silicon) reachable at `http://chrome:4444/wd/hub`
+  for FunctionalJavascript and Nightwatch tests, plus a `run-functional`
+  command that exports `MINK_DRIVER_ARGS_WEBDRIVER` and runs the browser
+  testsuite, with a live noVNC view on 7900.
+- `scripts/new-recipe.sh <name>` — scaffolds a `validate-recipes.sh`-clean
+  recipe skeleton (`.ddev/config.yaml` with `name:` + Drupal `type:` and a
+  `README.md` stub), validates the name and refuses to overwrite an existing
+  recipe. Documented in `CONTRIBUTING.md`.
 
 ## [0.2.0] - 2026-06-22
 

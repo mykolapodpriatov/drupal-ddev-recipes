@@ -1,0 +1,40 @@
+# Selenium standalone Chromium sidecar for Drupal FunctionalJavascript
+# (WebDriver) and Nightwatch browser tests.
+#
+# The "chromium" image is multi-arch, so it runs natively on Apple Silicon
+# (the amd64-only selenium/standalone-chrome image does not). Across the DDEV
+# Docker network the WebDriver endpoint is http://chrome:4444/wd/hub; the live
+# noVNC view of the browser is on 7900 (password: "secret").
+services:
+  chrome:
+    container_name: ddev-${DDEV_SITENAME}-chrome
+    image: selenium/standalone-chromium:latest
+    restart: "no"
+    # Chrome/Chromium crashes with Docker's default 64MB /dev/shm; give it more.
+    shm_size: "2gb"
+    expose:
+      - "4444"
+      - "7900"
+    environment:
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      # Let DDEV's router expose the WebDriver + noVNC ports on the hostname.
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTP_EXPOSE=4444:4444,7900:7900
+      - HTTPS_EXPOSE=4443:4444
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4444/wd/hub/status | grep -q '\"ready\": *true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+networks:
+  ddev_default:
+    name: ddev_default
+    external: true
