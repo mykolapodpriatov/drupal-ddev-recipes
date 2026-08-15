@@ -7,7 +7,8 @@
 #   2. Each recipe has a README.md.
 #   3. Each recipe (or recipe variant directory containing .ddev/) has a
 #      valid-looking .ddev/config.yaml with a `name:` and a `type:` field.
-#   4. shellcheck passes on .ddev/commands/**/* (if shellcheck is on PATH).
+#   4. shellcheck passes on .ddev/commands/**/* and scripts/*.sh
+#      (if shellcheck is on PATH).
 #
 # Exit code:
 #   0 — everything passed (or skipped because tooling missing)
@@ -84,13 +85,16 @@ done
 
 # ----- 3. shellcheck on bundled commands ---------------------------------
 if command -v shellcheck >/dev/null 2>&1; then
-  echo "==> Running shellcheck on .ddev/commands/**/*"
+  echo "==> Running shellcheck on .ddev/commands/**/* and scripts/*.sh"
   while IFS= read -r script; do
     if ! shellcheck -S warning -e SC1091,SC2034,SC2012 "$script"; then
       red "shellcheck failed on ${script#"$REPO_ROOT"/}"
       FAIL=1
     fi
-  done < <(find "$RECIPES_DIR" -type f -path '*/.ddev/commands/*' -not -name '*.md')
+  done < <(
+    find "$RECIPES_DIR" -type f -path '*/.ddev/commands/*' -not -name '*.md'
+    find "${REPO_ROOT}/scripts" -type f -name '*.sh'
+  )
 else
   yellow "shellcheck not installed — skipping shell lint."
 fi

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- CI `boot` job — matrix over every recipe `.ddev/config.yaml`, copies it
+  into a scratch project, runs `ddev start` + `ddev describe` so a broken
+  compose override fails in CI. Local reproduction:
+  `scripts/boot-recipe.sh <recipe>`.
 - PostgreSQL recipe — Drupal 11 on PostgreSQL 16 via DDEV's native
   `database.type: postgres`, with a `pgsql`-driver `settings.php` snippet and
   notes on how `ddev import-db` differs from MySQL (plain `pg_dump` only, no

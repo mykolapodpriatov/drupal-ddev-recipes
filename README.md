@@ -55,7 +55,8 @@ Before pushing changes, run:
 
 It runs `yamllint` on every YAML file under `recipes/` and checks that each
 recipe has the required structure (`README.md`, `.ddev/config.yaml`). CI runs
-the same script on every PR.
+the same script on every PR, plus a `boot` job that `ddev start`s each
+recipe in a scratch project (see [`CONTRIBUTING.md`](CONTRIBUTING.md)).
 
 ## Contributing
 
