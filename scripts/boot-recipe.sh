@@ -166,19 +166,29 @@ if not services:
     print("ddev describe reported no services", file=sys.stderr)
     sys.exit(1)
 
+# xhgui is a built-in DDEV service that stays stopped unless `ddev xhgui on`.
+# describe still lists it. Ignore that; fail on any other non-running service
+# (recipe sidecars such as solr/chrome/opensearch must actually come up).
+optional_stopped = {"xhgui"}
+
 bad = []
+checked = []
 for name, svc in sorted(services.items()):
     st = svc.get("status")
-    # Docker State.Status is "running" for a live container. Anything else
-    # (exited, created, paused, stopped) is a failed boot.
+    if name in optional_stopped and st == "stopped":
+        continue
+    checked.append(name)
     if st != "running":
         bad.append(f"{name}={st}")
+
+if "web" not in services or services["web"].get("status") != "running":
+    bad.append("web missing or not running")
 
 if bad:
     print("services not running: " + ", ".join(bad), file=sys.stderr)
     sys.exit(1)
 
-print(f"all {len(services)} services running: " + ", ".join(sorted(services)))
+print("checked running: " + ", ".join(checked))
 '
 
 # Extra proof the web container answers exec (covers a "running" but wedged web).
