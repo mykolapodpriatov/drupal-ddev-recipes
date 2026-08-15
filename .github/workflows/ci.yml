@@ -36,11 +36,9 @@ jobs:
       - name: Assert each recipes/* dir is listed in the root README table
         run: |
           set -euo pipefail
-          # The old `ddev-config` job here just re-ran validate-recipes.sh (which
-          # the `lint` job already runs) because `ddev config` needs a Docker
-          # provider that isn't available in CI. Replace it with a check that
-          # actually adds value: every recipe directory must appear in the
-          # root README recipe table, so a new recipe can't ship undocumented.
+          # Complements the `boot` job: every recipes/*/ directory must appear
+          # in the root README table so a new recipe cannot ship undocumented.
+          # (Docker *is* available on ubuntu-24.04; the boot job uses it.)
           missing=0
           for recipe_dir in recipes/*/; do
             name="$(basename "$recipe_dir")"
@@ -55,3 +53,53 @@ jobs:
             echo "Add the missing recipe(s) to the README recipe table."
             exit 1
           fi
+
+  # Real ddev start per recipe. ubuntu-24.04 runners already have Docker;
+  # the setup-ddev action only has to install the ddev binary. Repo root has
+  # no .ddev/, so autostart is off and boot-recipe.sh copies each recipe
+  # into a scratch project. Matrix is bounded (max-parallel + per-leg
+  # timeout) so a cold pull of Chromium/OpenSearch/Solr cannot monopolize
+  # the runner queue. fail-fast is off so one broken sidecar does not hide
+  # the others.
+  discover-recipes:
+    name: Discover bootable recipes
+    runs-on: ubuntu-24.04
+    outputs:
+      recipes: ${{ steps.list.outputs.recipes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: list
+        name: Enumerate directories that contain .ddev/config.yaml
+        run: |
+          set -euo pipefail
+          json="$(./scripts/boot-recipe.sh --json)"
+          echo "recipes=${json}" >> "${GITHUB_OUTPUT}"
+          echo "Discovered ${json}"
+
+  boot:
+    name: Boot ${{ matrix.recipe }}
+    needs: discover-recipes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        recipe: ${{ fromJSON(needs.discover-recipes.outputs.recipes) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup DDEV
+        uses: ddev/github-action-setup-ddev@v1
+        with:
+          autostart: false
+
+      # OpenSearch (and other JVM sidecars) want this above the kernel default.
+      # Harmless on recipes that do not run a JVM. Failure is ignored so a
+      # locked-down runner still gets the rest of the smoke.
+      - name: Raise vm.max_map_count for JVM sidecars
+        run: sudo sysctl -w vm.max_map_count=262144 || true
+
+      - name: ddev start the recipe in a scratch project
+        run: ./scripts/boot-recipe.sh "${{ matrix.recipe }}"

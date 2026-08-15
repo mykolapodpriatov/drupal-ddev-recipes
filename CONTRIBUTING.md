@@ -37,6 +37,34 @@ a tutorial. Please keep that bar in mind when proposing changes.
 3. Add an entry to the top-level `README.md` recipe table.
 4. Add a CHANGELOG entry under `[Unreleased]`.
 5. Run `scripts/validate-recipes.sh` locally before pushing.
+6. Reproduce the CI boot smoke if you touched `.ddev/` files:
+
+   ```bash
+   scripts/boot-recipe.sh <your-recipe>
+   ```
+
+   That copies the recipe into a scratch directory, runs `ddev start`,
+   checks `ddev describe` for a running project, then `ddev delete -Oy`.
+   No Drupal codebase is installed.
+
+## CI
+
+Every PR runs three jobs:
+
+- `lint` — `scripts/validate-recipes.sh` (yamllint + structure + shellcheck).
+- `readme-coverage` — every `recipes/*/` directory is linked from the
+  root README table.
+- `boot` — matrix over every directory that contains a `.ddev/config.yaml`
+  (so `redis-memcached-comparison` is two legs). Each leg installs DDEV
+  via `ddev/github-action-setup-ddev` on `ubuntu-24.04` (Docker is
+  provided by the runner), copies that `.ddev/` into a scratch project,
+  runs `ddev start`, asserts every container is running via
+  `ddev describe`, then `ddev delete -Oy`. Legs run in parallel with a
+  25-minute timeout. A real Drupal tree is not required.
+
+Recipes whose `ddev start` hooks need Composer (or other extra network
+beyond pulling images) are a known follow-up rather than a reason to
+skip the job. None of the current recipes do that.
 
 ## Style
 
