@@ -8,7 +8,7 @@ plugin: smtp
 configuration:
   user: ''
   pass: ''
-  host: mailpit
+  host: localhost
   port: 1025
   query:
     verify_peer: false
