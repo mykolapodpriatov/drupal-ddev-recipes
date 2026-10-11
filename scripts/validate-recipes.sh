@@ -99,7 +99,28 @@ else
   yellow "shellcheck not installed — skipping shell lint."
 fi
 
-# ----- 4. Mailpit recipe matches the DDEV web image -----------------------
+# ----- 4. Decoupled nginx must not serve PHP source ------------------------
+# The Drupal path location is a regex and is checked before the .php
+# location. It has try_files and no fastcgi_pass. Naming update.php or
+# install.php there makes nginx return the file as text.
+echo "==> Checking the decoupled nginx does not serve PHP source"
+nginx_conf="${RECIPES_DIR}/decoupled/.ddev/nginx_full/nginx-site.conf"
+if [ ! -f "$nginx_conf" ]; then
+  red "  [decoupled] missing nginx_full/nginx-site.conf"
+  FAIL=1
+else
+  drupal_location=$(grep -E 'location ~ \^/\(jsonapi\|' "$nginx_conf" || true)
+  if printf '%s\n' "$drupal_location" | grep -q 'update\\.php\|install\\.php'; then
+    red "  [decoupled] the Drupal path location matches a PHP file and would serve its source"
+    FAIL=1
+  fi
+  if ! grep -q 'fastcgi_pass' "$nginx_conf"; then
+    red "  [decoupled] nginx-site.conf has no fastcgi_pass, so PHP never runs"
+    FAIL=1
+  fi
+fi
+
+# ----- 5. Mailpit recipe matches the DDEV web image -----------------------
 # DDEV ^1.23 (the floor this repo documents) listens for SMTP inside the
 # web container at 127.0.0.1:1025 and ships /usr/local/bin/mailpit, not
 # mhsendmail. settings.ddev.php points Symfony Mailer at localhost:1025.
