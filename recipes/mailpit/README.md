@@ -1,8 +1,8 @@
 # Mailpit recipe
 
 DDEV ships with [Mailpit](https://mailpit.axllent.org/) built in since
-`v1.22`. PHP's `mail()` and any `sendmail`-style transport in the web
-container is auto-routed to Mailpit at `mailpit:1025` (SMTP) / `:8025` (UI).
+`v1.22`. From `v1.23` (the floor this repo supports) Mailpit is a process
+inside the web container. SMTP is `127.0.0.1:1025`. The UI is on `:8025`.
 
 This recipe doesn't add Mailpit (it's already there), it covers the
 **Drupal-side** wiring you actually need: making sure Symfony Mailer talks
@@ -41,7 +41,7 @@ Then either:
   recipe's `config/sync/` into your project's config sync directory, OR
 - Manually create an SMTP transport at
   `/admin/config/system/mailer/transport` with:
-  - Host: `mailpit`
+  - Host: `localhost`
   - Port: `1025`
   - Encryption: `none`
   - Auth: off
@@ -58,8 +58,8 @@ If nothing shows up:
 # From inside the web container, send a raw test:
 ddev exec 'echo "Test mail body" | mail -s "Test" you@example.com'
 
-# Then tail Mailpit logs:
-ddev logs -s mailpit
+# Mailpit is not its own service, so `ddev logs -s mailpit` has nothing
+# to follow. Open the UI above to see the captured message.
 ```
 
 ## Symfony Mailer vs the old core Mail interface
@@ -69,11 +69,13 @@ For Drupal 10.3+ and 11.x, **always use `symfony_mailer`** — the core
 
 - Real SMTP, Amazon SES, Postmark transports without contrib helpers.
 - Templated emails as Twig (per-message override-able by theme).
-- DSN-based transport config (`smtp://mailpit:1025`) — same format dev/prod.
+- DSN-based transport config (`smtp://127.0.0.1:1025`), the same shape in dev and prod.
 
 ## Why mail.ini
 
-`.ddev/php/mail.ini` forces PHP's `sendmail_path` to the container's
-mhsendmail binary, which speaks SMTP to Mailpit. This catches the rare
-modules that still call `mail()` directly (some old contrib + custom code).
-Without it, those emails are silently dropped.
+`.ddev/php/mail.ini` keeps PHP's `sendmail_path` on
+`/usr/local/bin/mailpit sendmail`, aimed at `127.0.0.1:1025`. That is the
+command the DDEV 1.23 web image already uses. The image does not ship
+`mhsendmail`, and the hostname `mailpit` does not resolve, so either of
+those overrides makes `mail()` fail. This still covers modules that call
+`mail()` directly.

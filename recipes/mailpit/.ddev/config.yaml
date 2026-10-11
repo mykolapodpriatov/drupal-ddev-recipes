@@ -13,12 +13,13 @@ database:
   version: "10.11"
 nodejs_version: "20"
 
-# DDEV ^1.22 starts the mailpit container automatically; nothing to add.
+# DDEV ^1.23 starts Mailpit inside the web container. Nothing to add.
+# SMTP is localhost:1025. There is no compose service named mailpit.
 
 web_environment:
   # Symfony Mailer reads MAILER_DSN if you set up the transport via env.
   # The bundled config/sync/symfony_mailer.mailer_transport.smtp.yml is
   # the recommended approach (config-managed transport), but the env var
   # is handy for ad-hoc overrides.
-  - MAILER_DSN=smtp://mailpit:1025
+  - MAILER_DSN=smtp://127.0.0.1:1025
   - DRUPAL_SITE_MAIL=noreply@example.com

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Mailpit recipe: `sendmail_path` called `mhsendmail` and Symfony Mailer
+  used the hostname `mailpit`. DDEV ^1.23 runs Mailpit inside the web
+  container, ships `/usr/local/bin/mailpit`, and listens on
+  `127.0.0.1:1025`. `settings.ddev.php` uses `localhost` for the same
+  reason. `scripts/validate-recipes.sh` now rejects the old binary and host.
+
 ### Added
 - CI `boot` job — matrix over every recipe `.ddev/config.yaml`, copies it
   into a scratch project, runs `ddev start` + `ddev describe` so a broken

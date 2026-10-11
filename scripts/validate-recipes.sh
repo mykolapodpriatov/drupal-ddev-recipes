@@ -99,6 +99,46 @@ else
   yellow "shellcheck not installed — skipping shell lint."
 fi
 
+# ----- 4. Mailpit recipe matches the DDEV web image -----------------------
+# DDEV ^1.23 (the floor this repo documents) listens for SMTP inside the
+# web container at 127.0.0.1:1025 and ships /usr/local/bin/mailpit, not
+# mhsendmail. settings.ddev.php points Symfony Mailer at localhost:1025.
+echo "==> Checking the mailpit recipe against the DDEV 1.23 Mailpit layout"
+mail_ini="${RECIPES_DIR}/mailpit/.ddev/php/mail.ini"
+mail_cfg="${RECIPES_DIR}/mailpit/.ddev/config.yaml"
+mail_yml="${RECIPES_DIR}/mailpit/config/sync/symfony_mailer.mailer_transport.smtp.yml"
+if [ -f "$mail_ini" ]; then
+  if grep -E '^[[:space:]]*sendmail_path' "$mail_ini" | grep -q 'mhsendmail'; then
+    red "  [mailpit] mail.ini calls mhsendmail, which DDEV ^1.23 does not ship"
+    FAIL=1
+  fi
+  if ! grep -q '/usr/local/bin/mailpit sendmail' "$mail_ini"; then
+    red "  [mailpit] mail.ini must route mail() through /usr/local/bin/mailpit sendmail"
+    FAIL=1
+  fi
+  if ! grep -q '127.0.0.1:1025' "$mail_ini"; then
+    red "  [mailpit] mail.ini must send to 127.0.0.1:1025"
+    FAIL=1
+  fi
+else
+  red "  [mailpit] missing .ddev/php/mail.ini"
+  FAIL=1
+fi
+if [ -f "$mail_yml" ]; then
+  if grep -qE '^[[:space:]]*host:[[:space:]]*mailpit[[:space:]]*$' "$mail_yml"; then
+    red "  [mailpit] SMTP host mailpit does not resolve; Mailpit is not a compose service"
+    FAIL=1
+  fi
+  if ! grep -qE '^[[:space:]]*host:[[:space:]]*localhost[[:space:]]*$' "$mail_yml"; then
+    red "  [mailpit] SMTP host must be localhost, matching settings.ddev.php"
+    FAIL=1
+  fi
+fi
+if [ -f "$mail_cfg" ] && grep -q 'smtp://mailpit:' "$mail_cfg"; then
+  red "  [mailpit] MAILER_DSN still uses the mailpit hostname"
+  FAIL=1
+fi
+
 echo ""
 if [ "$FAIL" -eq 0 ]; then
   green "All checks passed."
